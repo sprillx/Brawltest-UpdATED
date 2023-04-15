@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="eng">
+    <head>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="brawl.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Anton&family=Assistant&family=Dancing+Script:wght@500&family=Poppins:ital,wght@0,200;0,300;1,100;1,200&display=swap" rel="stylesheet">
+    </head>
+    <body>
+
+        <form id="myForm">
+          <input id="searchbar" type="text" placeholder="Enter a Brawlhalla Legend">  
+          <button type="submit">Enter</button>
+        </form>
+        
+        <h1>Brawl Results</h1>
+        <div class="bio-container">
+          <div class="icon-container">
+            <img id="icon" src="" alt="icon">
+          </div>
+          <div class="text-container">
+            <h2 id="bio-name"></h2>
+            <p id="forms"></p>
+            <p id="bio"></p>
+          </div>
+        </div>
+
+    <script src="brawl.js"> </script>
+    <script>
+      const form = document.getElementById('myForm');
+      form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        const searchBar = document.getElementById('searchbar').value;
+        const queryParams = new URLSearchParams({legend_name: searchBar});
+        fetch(`https://brawlhalla.fly.dev/v1/legends/name?${queryParams}`)
+        .then(response => response.json())
+        .then(data => {
+          const bioName = data.data.bio_name;
+          const bio = data.data.bio_text;
+          const forms = data.data.bio_quote;
+          const iconURL = data.data.thumbnail;
+          const newQueryParams = new URLSearchParams({bioName, bio, forms, iconURL});
+          history.pushState(null, null, `BrawlResults.html?${newQueryParams}`);
+          document.getElementById('icon').src = iconURL;
+          document.getElementById('bio-name').innerHTML = bioName;
+          document.getElementById('forms').innerHTML = forms;
+          document.getElementById('bio').innerHTML = bio;
+        })
+        .catch(error => console.error(error));
+      });
+
+      const queryParams = new URLSearchParams(location.search);
+      const bioName = queryParams.get('bioName');
+      const bio = queryParams.get('bio');
+      const forms = queryParams.get('forms');
+      const iconURL = queryParams.get('iconURL');
+      if (bioName && bio && forms && iconURL) {
+        document.getElementById('icon').src = iconURL;
+        document.getElementById('bio-name').innerHTML = bioName;
+        document.getElementById('forms').innerHTML = forms;
+        document.getElementById('bio').innerHTML = bio;
+      }
+    </script>
+    </body>
+</html>
